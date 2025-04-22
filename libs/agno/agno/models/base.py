@@ -1073,6 +1073,8 @@ class Model(ABC):
                 assistant_message.metrics.output_tokens = response_usage.get("completion_tokens", 0)
             if "total_tokens" in response_usage:
                 assistant_message.metrics.total_tokens = response_usage.get("total_tokens", 0)
+            if "cached_tokens" in response_usage:
+                assistant_message.metrics.cached_tokens = response_usage.get("cached_tokens", 0)
             else:
                 assistant_message.metrics.total_tokens = (
                     assistant_message.metrics.input_tokens + assistant_message.metrics.output_tokens
@@ -1090,6 +1092,8 @@ class Model(ABC):
                 assistant_message.metrics.completion_tokens = response_usage.completion_tokens
             if hasattr(response_usage, "total_tokens") and response_usage.total_tokens is not None:
                 assistant_message.metrics.total_tokens = response_usage.total_tokens
+            if hasattr(response_usage, "cached_tokens") and response_usage.cached_tokens is not None:
+                assistant_message.metrics.cached_tokens = response_usage.cached_tokens
             else:
                 assistant_message.metrics.total_tokens = (
                     assistant_message.metrics.input_tokens + assistant_message.metrics.output_tokens
@@ -1103,27 +1107,45 @@ class Model(ABC):
         if hasattr(response_usage, "prompt_tokens_details"):
             if isinstance(response_usage.prompt_tokens_details, dict):
                 assistant_message.metrics.prompt_tokens_details = response_usage.prompt_tokens_details
-                if "audio_tokens" in response_usage.prompt_tokens_details:
+                if (
+                    "audio_tokens" in response_usage.prompt_tokens_details
+                    and response_usage.prompt_tokens_details["audio_tokens"] is not None
+                ):
                     assistant_message.metrics.input_audio_tokens = response_usage.prompt_tokens_details["audio_tokens"]
-                if "cached_tokens" in response_usage.prompt_tokens_details:
+                if (
+                    "cached_tokens" in response_usage.prompt_tokens_details
+                    and response_usage.prompt_tokens_details["cached_tokens"] is not None
+                ):
                     assistant_message.metrics.cached_tokens = response_usage.prompt_tokens_details["cached_tokens"]
             elif hasattr(response_usage.prompt_tokens_details, "model_dump"):
                 assistant_message.metrics.prompt_tokens_details = response_usage.prompt_tokens_details.model_dump(
                     exclude_none=True
                 )
-                if hasattr(response_usage.prompt_tokens_details, "audio_tokens"):
+                if (
+                    hasattr(response_usage.prompt_tokens_details, "audio_tokens")
+                    and response_usage.prompt_tokens_details.audio_tokens is not None
+                ):
                     assistant_message.metrics.input_audio_tokens = response_usage.prompt_tokens_details.audio_tokens
-                if hasattr(response_usage.prompt_tokens_details, "cached_tokens"):
+                if (
+                    hasattr(response_usage.prompt_tokens_details, "cached_tokens")
+                    and response_usage.prompt_tokens_details.cached_tokens is not None
+                ):
                     assistant_message.metrics.cached_tokens = response_usage.prompt_tokens_details.cached_tokens
 
         if hasattr(response_usage, "completion_tokens_details"):
             if isinstance(response_usage.completion_tokens_details, dict):
                 assistant_message.metrics.completion_tokens_details = response_usage.completion_tokens_details
-                if "audio_tokens" in response_usage.completion_tokens_details:
+                if (
+                    "audio_tokens" in response_usage.completion_tokens_details
+                    and response_usage.completion_tokens_details["audio_tokens"] is not None
+                ):
                     assistant_message.metrics.output_audio_tokens = response_usage.completion_tokens_details[
                         "audio_tokens"
                     ]
-                if "reasoning_tokens" in response_usage.completion_tokens_details:
+                if (
+                    "reasoning_tokens" in response_usage.completion_tokens_details
+                    and response_usage.completion_tokens_details["reasoning_tokens"] is not None
+                ):
                     assistant_message.metrics.reasoning_tokens = response_usage.completion_tokens_details[
                         "reasoning_tokens"
                     ]
@@ -1131,11 +1153,17 @@ class Model(ABC):
                 assistant_message.metrics.completion_tokens_details = (
                     response_usage.completion_tokens_details.model_dump(exclude_none=True)
                 )
-                if hasattr(response_usage.completion_tokens_details, "audio_tokens"):
+                if (
+                    hasattr(response_usage.completion_tokens_details, "audio_tokens")
+                    and response_usage.completion_tokens_details.audio_tokens is not None
+                ):
                     assistant_message.metrics.output_audio_tokens = (
                         response_usage.completion_tokens_details.audio_tokens
                     )
-                if hasattr(response_usage.completion_tokens_details, "reasoning_tokens"):
+                if (
+                    hasattr(response_usage.completion_tokens_details, "reasoning_tokens")
+                    and response_usage.completion_tokens_details.reasoning_tokens is not None
+                ):
                     assistant_message.metrics.reasoning_tokens = (
                         response_usage.completion_tokens_details.reasoning_tokens
                     )
